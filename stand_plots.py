@@ -14,12 +14,7 @@ import geopandas as gpd
 import random
 from sklearn.cluster import KMeans
 import numpy as np
-
-# Read in stand polygons
-#STANDS = '/Users/aaron/Desktop/temp/snf_stands_subset.shp'
-
-# Outdata location
-#OUTFILE = "/Users/aaron/Desktop"
+from tqdm import tqdm
 
 # Command line args
 parser = argparse.ArgumentParser(description='Process command line arguments.')
@@ -30,10 +25,18 @@ args = parser.parse_args()
 
 def plot_size(row):
     """
-    -input is a single polygon
-    -Determines the number of plots per acre
-    -returns the number of plots per acres
+    Determines the number of plots per acre
+
+    Parameters
+    ----------
+    row : single shapely polygon geometry 
+
+    Returns
+    -------
+    int
+        Number of plots per acre
     """
+    
     acres = row["geometry"].area  * 0.000247105 # Get area in acres
     
     if acres <= 15:
@@ -64,6 +67,21 @@ def plot_size(row):
         return 15      
 
 def random_points_in_polygon(number, polygon):
+    """
+
+    Parameters
+    ----------
+    number : TYPE
+        DESCRIPTION.
+    polygon : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    """
 
     points = []
     min_x, min_y, max_x, max_y = polygon.bounds
@@ -130,10 +148,10 @@ def main(STANDS, OUTFILE):
     # Populate this empty list with cluster centroids
     centroids_l = []
     
-    counter = 1
+    # counter = 1
     
     # Loop through each row in the STANDS DF
-    for i, row in STANDS.iterrows():
+    for i, row in tqdm(STANDS.iterrows()):
         
         # Determine number of clusters based on polygon area
         size = plot_size(row)
@@ -147,8 +165,8 @@ def main(STANDS, OUTFILE):
         # Calculate point cluster centroids
         cluster_centroids(clusters, centroids_l)
         
-        counter += 1
-        print(f"{counter} of {len(STANDS)}")
+        # counter += 1
+        # print(f"{counter} of {len(STANDS)}")
         
     # Convert list of cluster centroids to GDF then to geopackage
     post_process(centroids_l, STANDS, OUTFILE)
