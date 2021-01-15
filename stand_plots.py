@@ -3,7 +3,9 @@
 """
 Created on Fri Dec  4 22:02:40 2020
 
-@author: aaron
+USAGE: python ./stand_plots.py -i '/Users/aaron/Desktop/temp/snf_stands_subset.shp' -o '/Users/aaron/Desktop/temp/plots.shp'
+
+@author: Aaron @ RedFox GIS & Remote Sensing
 """
 
 import argparse
@@ -21,7 +23,6 @@ parser = argparse.ArgumentParser(description='Process command line arguments.')
 parser.add_argument("-i", "--input", help = "input filename")
 parser.add_argument("-o", "--output", help = "output filename")
 args = parser.parse_args()
-
 
 def plot_size(row):
     """
@@ -68,18 +69,17 @@ def plot_size(row):
 
 def random_points_in_polygon(number, polygon):
     """
-
     Parameters
     ----------
-    number : TYPE
-        DESCRIPTION.
+    number : int
+        The number of points to be generated in the polygon
     polygon : TYPE
-        DESCRIPTION.
+        shapely polygon geometry.
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    List
+        List of shapely geometries
 
     """
 
@@ -94,6 +94,18 @@ def random_points_in_polygon(number, polygon):
     return points  # returns list of shapely point
 
 def random_points(row):
+    """
+    Parameters
+    ----------
+    row : shapely geometry
+        shapely geometry of stand polygon.
+
+    Returns
+    -------
+    points_gdf : Geodataframe
+        A geodataframe of random points in a forest stand polygon
+
+    """
     # Negative buffer 
     neg_buffer = row['geometry'].buffer(-20.1168)
     
@@ -151,7 +163,7 @@ def main(STANDS, OUTFILE):
     # counter = 1
     
     # Loop through each row in the STANDS DF
-    for i, row in tqdm(STANDS.iterrows()):
+    for i, row in tqdm(STANDS.iterrows(), total=len(STANDS)):
         
         # Determine number of clusters based on polygon area
         size = plot_size(row)
