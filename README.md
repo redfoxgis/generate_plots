@@ -2,8 +2,8 @@
 Repository for the USFS plots project.
 
 The purpose of this repository:
--Generates uniform plots (points) in forest stand polygons. 
--Plots are generated based on the size of the forest stand (acres). 
+- Generates uniform plots (points) in forest stand polygons. 
+- Plots are generated based on the size of the forest stand (acres). 
 
 ## Environment settings
 ### Installing anaconda
