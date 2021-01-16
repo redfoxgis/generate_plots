@@ -117,6 +117,21 @@ def random_points(row):
     return points_gdf
 
 def cluster_points(points_gdf, size):
+    """
+    Parameters
+    ----------
+    points_gdf : geodataframe
+        A geodataframe of random points within a polygon
+    size : int
+        The number of clusters
+
+    Returns
+    -------
+    gdf_cluster : geodataframe
+        A geodataframe containing clusters of points
+
+    """
+    
     # Cluster points
     # https://samdotson1992.github.io/SuperGIS/blog/k-means-clustering/
     x=pd.Series(points_gdf['geometry'].apply(lambda p: p.x))
@@ -130,6 +145,20 @@ def cluster_points(points_gdf, size):
     return gdf_cluster
 
 def cluster_centroids(gdf_cluster, empty_list):
+    """
+    Parameters
+    ----------
+    gdf_cluster : geodataframe
+        A geodataframe of point clusters
+    empty_list : list
+        An empty list to append centroids to
+
+    Returns
+    -------
+    None.
+
+    """
+    
     # Calculate centroids
     dissolved_clusters = gdf_cluster.dissolve(by='cluster')
     centroids = dissolved_clusters.representative_point() #Make sure centroid is within polygon
@@ -138,6 +167,24 @@ def cluster_centroids(gdf_cluster, empty_list):
     empty_list.append(centroids)
     
 def post_process(centroids_l, STANDS, OUTFILE):
+    """
+    Clean up centroids list, spatially join attributes from original STANDS polys and write to file
+
+    Parameters
+    ----------
+    centroids_l : list
+        A list of centroids
+    STANDS : geodataframe
+        A polygon geodatabase of forest stand polygons
+    OUTFILE : Geopackage
+        The output file in geopackage format
+
+    Returns
+    -------
+    None.
+
+    """
+    
     # Flatten list of centroids
     points_flattened = [item for sublist in centroids_l for item in sublist]
     
