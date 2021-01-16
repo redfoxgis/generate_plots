@@ -19,3 +19,9 @@ Then we need to activate the environment by using
 `conda activate yourenvname`
 
 Having activated the environment, the following dependencies need to be installed:
+
+* geopandas (0.8.1+): `conda install geopandas`
+* sklearn (0.24.0+):  `conda install scikit-learn`
+* tqdm (4.56.0+):     `conda install tqdm`
+
+Other dependencies such as `gdal`, `shapely`, `pandas`, and `numpy` will be installed during the `geopandas` and `sklearn` installs.
