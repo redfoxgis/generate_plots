@@ -3,7 +3,11 @@
 """
 Created on Fri Dec  4 22:02:40 2020
 
-USAGE: python ./stand_plots.py -i '/Users/aaron/Desktop/temp/snf_stands_subset.shp' -o '/Users/aaron/Desktop/temp/plots.shp'
+This program generates uniformly distributed plots within forest stand polygons. The number of plots in each forest stand 
+is determined by the size (acres) of the forest stand.
+
+USAGE: 
+    python ./stand_plots.py -i '/Users/aaron/Desktop/temp/snf_stands_subset.shp' -o '/Users/aaron/Desktop/temp/plots.shp'
 
 @author: Aaron @ RedFox GIS & Remote Sensing
 """
