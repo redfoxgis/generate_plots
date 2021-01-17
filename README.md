@@ -12,7 +12,7 @@ The purpose of this repository:
 For installing `anaconda`, please check its [website](https://www.anaconda.com/distribution/).
 After installing `anaconda`, we need to create a development environment (if there exists already a development environment, then no need to create a new one). Use the following command to create a new development environment:
 ```shell
-conda create -n yourenvname python=x.x anaconda
+conda create --name ENVNAME python=x.x
 ```
 Then we need to activate the environment by using
 ```shell
@@ -27,12 +27,12 @@ Having activated the environment, the following dependencies need to be installe
 Other dependencies such as `gdal`, `shapely`, `pandas`, and `numpy` will be installed during the `geopandas` and `sklearn` installs.
 
 ## How to run
-Activate the conda environment created above
+If not already done, activate the conda environment created above
 ```shell
 conda activate geopandas
 ```
 
-In the command prompt, specify the input polygon data (forest stands) and the output geopackage path and name of the plots
+In the shell, specify the python script, input polygon data (forest stands) and the output geopackage path and name of the plots
 ```shell
 python ./stand_plots.py -i '/path/to/input_polygon_data.shp' -o '/path/to/plots.gpkg'
 ```
