@@ -5,6 +5,8 @@ The purpose of this repository:
 - Generate uniformly distributed plots (points) in forest stand polygons. 
 - Plots are generated based on the size of the forest stand (acres). 
 
+![alt text](https://github.com/redfoxgis/generate_plots/blob/main/plots_screenshot.png)
+
 ## Environment settings
 ### Installing anaconda
 `anaconda` is a repository containing popular packages. The good thing about `anaconda` is that it is cross-platform.
