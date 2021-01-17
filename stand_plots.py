@@ -3,11 +3,11 @@
 """
 Created on Fri Dec  4 22:02:40 2020
 
-This program generates uniformly distributed plots within forest stand polygons. The number of plots in each forest stand 
-is determined by the size (acres) of the forest stand.
+This program generates uniformly distributed plots within forest stand polygons. 
+The number of plots in each forest stand is determined by the size (acres) of the forest stand.
 
 USAGE: 
-    python ./stand_plots.py -i '/Users/aaron/Desktop/temp/snf_stands_subset.shp' -o '/Users/aaron/Desktop/temp/plots.shp'
+    python ./stand_plots.py -i '/path/to/input_polygon_data.shp' -o '/path/to/plots.gpkg'
 
 @author: Aaron @ RedFox GIS & Remote Sensing
 """
@@ -211,8 +211,6 @@ def main(STANDS, OUTFILE):
     # Populate this empty list with cluster centroids
     centroids_l = []
     
-    # counter = 1
-    
     # Loop through each row in the STANDS DF
     for i, row in tqdm(STANDS.iterrows(), total=len(STANDS)):
         
@@ -227,9 +225,6 @@ def main(STANDS, OUTFILE):
       
         # Calculate point cluster centroids
         cluster_centroids(clusters, centroids_l)
-        
-        # counter += 1
-        # print(f"{counter} of {len(STANDS)}")
         
     # Convert list of cluster centroids to GDF then to geopackage
     post_process(centroids_l, STANDS, OUTFILE)
