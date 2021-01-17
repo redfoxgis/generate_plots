@@ -25,3 +25,10 @@ Having activated the environment, the following dependencies need to be installe
 * tqdm (4.56.0+):     `conda install tqdm`
 
 Other dependencies such as `gdal`, `shapely`, `pandas`, and `numpy` will be installed during the `geopandas` and `sklearn` installs.
+
+## How to run
+Activate the conda environment created above
+`conda activate geopandas`
+
+In the command prompt, specify the input polygon data (forest stands) and the output geopackage path and name of the plots
+`python ./stand_plots.py -i '/path/to/input_polygon_data.shp' -o '/path/to/plots.gpkg'`
