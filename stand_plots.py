@@ -22,11 +22,13 @@ from sklearn.cluster import KMeans
 import numpy as np
 from tqdm import tqdm
 
-# Command line args
-parser = argparse.ArgumentParser(description='Process command line arguments.')
-parser.add_argument("-i", "--input", help = "input filename")
-parser.add_argument("-o", "--output", help = "output filename")
-args = parser.parse_args()
+def parse_args():
+    # Shell args
+    parser = argparse.ArgumentParser(description='Process command line arguments.')
+    parser.add_argument("-i", "--input", help = "input filename")
+    parser.add_argument("-o", "--output", help = "output filename")
+    args = parser.parse_args()
+    return args
 
 def plot_size(row):
     """
@@ -229,8 +231,9 @@ def main(STANDS, OUTFILE):
     # Convert list of cluster centroids to GDF then to geopackage
     post_process(centroids_l, STANDS, OUTFILE)
 
-if __name__ == "__main__":        
-        main(args.input, args.output)
+if __name__ == "__main__":      
+    args = parse_args()
+    main(args.input, args.output)
             
 
         
