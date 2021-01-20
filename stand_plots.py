@@ -172,7 +172,7 @@ def cluster_centroids(gdf_cluster, empty_list):
     # Append centroids to centroids_gdf
     empty_list.append(centroids)
     
-def post_process(centroids_l, STANDS, OUTFILE):
+def post_process(centroids_l, STANDS, sr, OUTFILE):
     """
     Clean up centroids list, spatially join attributes from original STANDS polys and write to file
 
@@ -196,19 +196,25 @@ def post_process(centroids_l, STANDS, OUTFILE):
     
     # Convert list of centroids to geodataframe and rename geometry column
     centroids_gdf = gpd.GeoDataFrame(points_flattened)
-    centroids_gdf.rename(columns = {0:'geometry'}, inplace = True)
-    # centroids_gdf.set_crs(epsg=26915, inplace=True)
+    centroids_gdf.rename(columns = {0:'geometry'}, inplace = True) # Create (rename) a geometry column
+    centroids_gdf.crs = sr # Set crs to utm 15N
     
     # Assign polygon ID to centroids
     result = gpd.sjoin(centroids_gdf, STANDS, how = 'inner', op = 'intersects')
-    result.set_crs(epsg=26915, inplace=True)
+    result.crs = sr
     
     # Write to file
-    result.to_file(OUTFILE, layer='plots', driver="GPKG")
+    if os.path.splitext(OUTFILE)[1] == '.gpkg':
+        result.to_file(OUTFILE, layer='plots', driver="GPKG")
+    elif os.path.splitext(OUTFILE)[1] == '.shp':
+        result.to_file(OUTFILE)
+    else:
+        raise ValueError("This tool only allows Geopackage (.gpkg) and Shapefile (.shp) output")
         
 def main(STANDS, OUTFILE):
     # Read in shapefile as geopandas df
     STANDS = gpd.read_file(STANDS)
+    sr = STANDS.crs
     
     # Populate this empty list with cluster centroids
     centroids_l = []
@@ -229,7 +235,7 @@ def main(STANDS, OUTFILE):
         cluster_centroids(clusters, centroids_l)
         
     # Convert list of cluster centroids to GDF then to geopackage
-    post_process(centroids_l, STANDS, OUTFILE)
+    post_process(centroids_l, STANDS, sr, OUTFILE)
 
 if __name__ == "__main__":      
     args = parse_args()
