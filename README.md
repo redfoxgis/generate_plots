@@ -1,4 +1,4 @@
-# generate_plots
+# Generate Uniformly Distributed Plots
 Repository for the USFS plots project.
 
 The purpose of this repository:
