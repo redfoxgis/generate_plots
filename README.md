@@ -32,10 +32,10 @@ Other dependencies such as `gdal`, `shapely`, `pandas`, and `numpy` will be inst
 ## How to run
 If not already done, activate the conda environment created above
 ```shell
-conda activate geopandas
+conda activate ENVNAME
 ```
 
 In the shell, specify the python script, input polygon data (forest stands) and the output shapefile (.shp) or geopackage (.gpkg) path and name of the plots
 ```shell
-python ./stand_plots.py -i '/path/to/input_polygon_data.shp' -o '/path/to/plots.gpkg'
+python ./stand_plots.py -i /path/to/input_polygon_data.shp -o /path/to/plots.gpkg
 ```
