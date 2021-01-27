@@ -13,7 +13,7 @@ The purpose of this repository:
 `anaconda` is a repository containing popular packages. The good thing about `anaconda` is that it is cross-platform.
 
 For installing `anaconda`, please check its [website](https://www.anaconda.com/distribution/).
-After installing `anaconda`, we need to create a development environment (if there exists already a development environment, then no need to create a new one). Use the following command to create a new development environment:
+After installing `anaconda`, we need to create a development environment (if there is already a development environment, then no need to create a new one). Use the following command to create a new development environment:
 ```shell
 conda create --name ENVNAME python=x.x
 ```
