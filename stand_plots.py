@@ -20,6 +20,7 @@ import geopandas as gpd
 import random
 from sklearn.cluster import KMeans
 import numpy as np
+from bisect import bisect_left
 from tqdm import tqdm
 
 def parse_args():
@@ -27,52 +28,61 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
     parser.add_argument("-i", "--input", help = "input filename")
     parser.add_argument("-o", "--output", help = "output filename")
+    parser.add_argument("-b", "--break_list", nargs='+', type=int, help = "break_list")
+    parser.add_argument("-p", "--plot_list", nargs='+', type=int, help = "plot_list")
     args = parser.parse_args()
     return args
 
-def plot_size(row):
+def plot_size(row, break_values, plot_values):
     """
-    Determines the number of plots per acre
+    Finds the number of plots for a particular stand based off the area.
+    Note the area units are based off the input crs
 
     Parameters
     ----------
-    row : single shapely polygon geometry 
+    area : float or int
+        The value to test (area of a stand polygon)
+    break_values : list
+        [x,...]
+        example:
+            [15,20,25,35,45]
+            
+        translates to:
+            
+              0-15
+            >15-20
+            >20-25
+            >25-35
+            >35-45
+            >45
+            
+    plot_values : list
+        [x,...]
+        Note there should be 1 more value than the break_values to
+        account for the last break range: >x
+
+    Raises
+    ------
+    ValueError
+        The plot_values list should contain 1 more value than the break_values.
 
     Returns
     -------
-    int
-        Number of plots per acre
+    TYPE
+        The number of plots for a particular stand.
+
     """
     
     acres = row["geometry"].area  * 0.000247105 # Get area in acres
-    
-    if acres <= 15:
-        return 3
-    elif 20 >= acres >15:
-        return 4
-    elif 25 >= acres > 20:
-        return 5       
-    elif 35 >= acres > 25:
-        return 6     
-    elif 45 >= acres > 35:
-        return 7     
-    elif 55 >= acres > 45:
-        return 8     
-    elif 65 >= acres > 55:
-        return 9     
-    elif 75 >= acres > 65:
-        return 10                     
-    elif 85 >= acres > 75:
-        return 11     
-    elif 95 >= acres > 85:
-        return 12     
-    elif 105 >= acres > 95:
-        return 13     
-    elif 115 >= acres > 105:
-        return 14         
-    elif acres > 115:
-        return 15      
 
+    if len(break_values) + 1 == len(plot_values):
+    
+        i = bisect_left(break_values,int(acres))
+        return plot_values[i]
+    
+    else:
+        raise ValueError("The plot_values list should contain 1 more value than the break_values")
+        
 def random_points_in_polygon(number, polygon):
     """
     Parameters
@@ -211,7 +221,7 @@ def post_process(centroids_l, STANDS, sr, OUTFILE):
     else:
         raise ValueError("This tool only allows Geopackage (.gpkg) and Shapefile (.shp) output")
         
-def main(STANDS, OUTFILE):
+def main(STANDS, OUTFILE, break_values, plot_values):
     # Read in shapefile as geopandas df
     STANDS = gpd.read_file(STANDS)
     sr = STANDS.crs
@@ -223,7 +233,7 @@ def main(STANDS, OUTFILE):
     for i, row in tqdm(STANDS.iterrows(), total=len(STANDS)):
         
         # Determine number of clusters based on polygon area
-        size = plot_size(row)
+        size = plot_size(row, break_values, plot_values)
     
         # Generate 1000 random points in negative buffer polygon
         random_points_gdf = random_points(row)
@@ -239,10 +249,4 @@ def main(STANDS, OUTFILE):
 
 if __name__ == "__main__":      
     args = parse_args()
-    main(args.input, args.output)
-            
-
-        
-    
-
-
+    main(args.input, args.output, args.break_list, args.plot_list)
