@@ -28,7 +28,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Process command line arguments.')
     parser.add_argument("-i", "--input", help = "input filename")
     parser.add_argument("-o", "--output", help = "output filename")
-    parser.add_argument("-b", "--break_list", nargs='+', type=int, help = "break_list")
+    parser.add_argument("-r", "--range_list", nargs='+', type=int, help = "range_list")
     parser.add_argument("-p", "--plot_list", nargs='+', type=int, help = "plot_list")
     parser.add_argument("-u", "--units", type=str, default = "acres", help = "Units: acres or hectares")
     args = parser.parse_args()
@@ -280,4 +280,4 @@ def main(STANDS, OUTFILE, break_values, plot_values, units):
 
 if __name__ == "__main__":      
     args = parse_args()
-    main(args.input, args.output, args.break_list, args.plot_list, args.units)
+    main(args.input, args.output, args.range_list, args.plot_list, args.units)
