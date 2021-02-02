@@ -31,6 +31,7 @@ def parse_args():
     parser.add_argument("-r", "--range_list", nargs='+', type=int, help = "range_list")
     parser.add_argument("-p", "--plot_list", nargs='+', type=int, help = "plot_list")
     parser.add_argument("-u", "--units", type=str, default = "acres", help = "Units: acres or hectares")
+    parser.add_argument("-b", "--buffer", type=float, default = 0, help = "Negative buffer distance in map units")
     args = parser.parse_args()
     return args
 
@@ -138,7 +139,7 @@ def random_points_in_polygon(number, polygon):
             i += 1
     return points  # returns list of shapely point
 
-def random_points(row):
+def random_points(row, buffer_dist):
     """
     Parameters
     ----------
@@ -152,7 +153,7 @@ def random_points(row):
 
     """
     # Negative buffer 
-    neg_buffer = row['geometry'].buffer(-20.1168)
+    neg_buffer = row['geometry'].buffer(-buffer_dist)
     
     # Generate 1000 random points in each polygon
     points = random_points_in_polygon(1000, neg_buffer)
@@ -250,7 +251,7 @@ def post_process(centroids_l, STANDS, sr, OUTFILE):
     else:
         raise ValueError("This tool only allows Geopackage (.gpkg) and Shapefile (.shp) output")
         
-def main(STANDS, OUTFILE, break_values, plot_values, units):
+def main(STANDS, OUTFILE, break_values, plot_values, units, buffer):
     # Read in shapefile as geopandas df
     STANDS = gpd.read_file(STANDS)
     sr = STANDS.crs
@@ -267,7 +268,7 @@ def main(STANDS, OUTFILE, break_values, plot_values, units):
         size = plot_size(row, break_values, plot_values, units)
     
         # Generate 1000 random points in negative buffer polygon
-        random_points_gdf = random_points(row)
+        random_points_gdf = random_points(row, buffer)
     
         # Cluster points
         clusters = cluster_points(random_points_gdf, size)
@@ -280,4 +281,4 @@ def main(STANDS, OUTFILE, break_values, plot_values, units):
 
 if __name__ == "__main__":      
     args = parse_args()
-    main(args.input, args.output, args.range_list, args.plot_list, args.units)
+    main(args.input, args.output, args.range_list, args.plot_list, args.units, args.buffer)
