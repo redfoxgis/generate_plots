@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument("-o", "--output", help = "output filename")
     parser.add_argument("-b", "--break_list", nargs='+', type=int, help = "break_list")
     parser.add_argument("-p", "--plot_list", nargs='+', type=int, help = "plot_list")
+    parser.add_argument("-u", "--units", type=str, default = "acres", help = "Units: acres or hectares")
     args = parser.parse_args()
     return args
 
@@ -57,14 +58,14 @@ def check_data(sr):
     if sr.axis_info[0].unit_name != 'metre':
         raise ValueError("This tool only allows data in a projected coordinate system with units as meters")
 
-def plot_size(row, break_values, plot_values):
+def plot_size(row, break_values, plot_values, units):
     """
     Finds the number of plots for a particular stand based off the area.
     Note the area units are based off the input crs
 
     Parameters
     ----------
-    area : float or int
+    row : float or int
         The value to test (area of a stand polygon)
     break_values : list
         [x,...]
@@ -96,12 +97,16 @@ def plot_size(row, break_values, plot_values):
         The number of plots for a particular stand.
 
     """
-    
-    acres = row["geometry"].area  * 0.000247105 # Get area in acres
+    if units in ['acres', 'Acres','a','A']:
+        area = row["geometry"].area  * 0.000247105 # Get area in acres
+    elif units in ['hectares', 'Hectares', 'h', 'H']:
+        area = row["geometry"].area  * 0.0001 # Get area in hectares
+    else:
+        raise ValueError("Area units must be acres or hectares")
 
     if len(break_values) + 1 == len(plot_values):
     
-        i = bisect_left(break_values,int(acres))
+        i = bisect_left(break_values,int(area))
         return plot_values[i]
     
     else:
@@ -245,7 +250,7 @@ def post_process(centroids_l, STANDS, sr, OUTFILE):
     else:
         raise ValueError("This tool only allows Geopackage (.gpkg) and Shapefile (.shp) output")
         
-def main(STANDS, OUTFILE, break_values, plot_values):
+def main(STANDS, OUTFILE, break_values, plot_values, units):
     # Read in shapefile as geopandas df
     STANDS = gpd.read_file(STANDS)
     sr = STANDS.crs
@@ -259,7 +264,7 @@ def main(STANDS, OUTFILE, break_values, plot_values):
     for i, row in tqdm(STANDS.iterrows(), total=len(STANDS)):
         
         # Determine number of clusters based on polygon area
-        size = plot_size(row, break_values, plot_values)
+        size = plot_size(row, break_values, plot_values, units)
     
         # Generate 1000 random points in negative buffer polygon
         random_points_gdf = random_points(row)
@@ -275,4 +280,4 @@ def main(STANDS, OUTFILE, break_values, plot_values):
 
 if __name__ == "__main__":      
     args = parse_args()
-    main(args.input, args.output, args.break_list, args.plot_list)
+    main(args.input, args.output, args.break_list, args.plot_list, args.units)
