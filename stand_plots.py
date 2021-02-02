@@ -33,6 +33,30 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+def check_data(sr):
+    """
+    Check the input data for a projected coordinate system and meter units
+
+    Parameters
+    ----------
+    sr : pyproj.crs.crs.CRS
+        spatial reference object
+
+    Raises
+    ------
+    ValueError
+        The tools raises an error of the spatial reference is not projected and units are not in meters
+
+    Returns
+    -------
+    None.
+
+    """
+    if sr.is_projected == False:
+        raise ValueError("This tool only allows data in a projected coordinate system")
+    if sr.axis_info[0].unit_name != 'metre':
+        raise ValueError("This tool only allows data in a projected coordinate system with units as meters")
+
 def plot_size(row, break_values, plot_values):
     """
     Finds the number of plots for a particular stand based off the area.
@@ -225,6 +249,8 @@ def main(STANDS, OUTFILE, break_values, plot_values):
     # Read in shapefile as geopandas df
     STANDS = gpd.read_file(STANDS)
     sr = STANDS.crs
+    
+    check_data(sr) # Check to make sure data is projected and units are meters
     
     # Populate this empty list with cluster centroids
     centroids_l = []
