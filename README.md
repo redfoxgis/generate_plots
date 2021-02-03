@@ -42,7 +42,9 @@ python ./stand_plots.py -i /path/to/input_polygon_data.shp -o /path/to/plots.gpk
 The following flags are available:
 
 `-i` The input forest stand (polygon) data
+
 `-o` The output plot (point) data. Valid output formats include shapefile (.shp) and geopackage (.gpkg)
+
 `-r` A list of range values to help determine how many plots will be assigned for each forest stand polygon. For example `-r 10 20 30 50 100` would translate to:
 
     Range Values
@@ -64,4 +66,5 @@ The following flags are available:
     >100              10
     
 `-u` The units used for the range values: acres or hectares. `default = acres`.
+
 `-b` A buffer distance in map units used to ensure plot points are not within a certain distance from the polygon edge. `default = 0`
