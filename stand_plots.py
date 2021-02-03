@@ -7,7 +7,7 @@ This program generates uniformly distributed plots within forest stand polygons.
 The number of plots in each forest stand is determined by the size (acres) of the forest stand.
 
 USAGE: 
-    python ./stand_plots.py -i '/path/to/input_polygon_data.shp' -o '/path/to/plots.gpkg'
+    python ./stand_plots.py -i /input_polygon_data.shp -o /output_plots.gpkg -r 10 20 30 50 100 -p 1 2 3 4 5 10 -u acres -b 10
 
 @author: Aaron @ RedFox GIS & Remote Sensing
 """
