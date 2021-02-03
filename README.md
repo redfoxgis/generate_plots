@@ -4,7 +4,7 @@ Repository for the USFS plots project.
 The purpose of this repository:
 - Generate uniformly distributed plots (points) in forest stand polygons. 
 - Plots are generated based on the size of the forest stand (acres). 
-- No plot can be within 66 ft (1 chain) of a polygon boundary.
+- No plot can be within `n` distance of a polygon boundary.
 
 ![alt text](https://github.com/redfoxgis/generate_plots/blob/main/plots_screenshot.png)
 
