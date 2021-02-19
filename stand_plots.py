@@ -145,6 +145,11 @@ def random_points(row, buffer_dist):
     ----------
     row : shapely geometry
         shapely geometry of stand polygon.
+        
+    Raises
+    ------
+    Exception
+        If the buffer value is too big, it warns the user to choose a smaller value
 
     Returns
     -------
@@ -152,15 +157,19 @@ def random_points(row, buffer_dist):
         A geodataframe of random points in a forest stand polygon
 
     """
-    # Negative buffer 
-    neg_buffer = row['geometry'].buffer(-buffer_dist)
-    
-    # Generate 1000 random points in each polygon
-    points = random_points_in_polygon(1000, neg_buffer)
-    points_gdf = gpd.GeoDataFrame(points)
-    points_gdf.rename(columns = {0:'geometry'}, inplace = True)
-    # points_gdf.set_crs(epsg=26915)
-    return points_gdf
+    try:
+        # Negative buffer 
+        neg_buffer = row['geometry'].buffer(-buffer_dist)
+        
+        # Generate 1000 random points in each polygon
+        points = random_points_in_polygon(1000, neg_buffer)
+        points_gdf = gpd.GeoDataFrame(points)
+        points_gdf.rename(columns = {0:'geometry'}, inplace = True)
+        # points_gdf.set_crs(epsg=26915)
+        return points_gdf
+    except ValueError as e:
+        raise Exception('Please choose a smaller buffer value') from e
+
 
 def cluster_points(points_gdf, size):
     """
