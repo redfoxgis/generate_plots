@@ -15,7 +15,7 @@ The purpose of this repository:
 For installing `anaconda`, please check its [website](https://www.anaconda.com/distribution/).
 After installing `anaconda`, we need to create a development environment (if there is already a development environment, then no need to create a new one). Use the following command to create a new development environment:
 ```shell
-conda create --name ENVNAME python=x.x
+conda create --name ENVNAME python=3.6
 ```
 Then we need to activate the environment by using
 ```shell
@@ -23,9 +23,9 @@ conda activate yourenvname
 ```
 Having activated the environment, the following dependencies need to be installed:
 
-* geopandas (0.8.1+): `conda install geopandas`
-* sklearn (0.24.0+):  `conda install scikit-learn`
-* tqdm (4.56.0+):     `conda install tqdm`
+* geopandas (0.8.1+): `conda install geopandas=0.8.1`
+* sklearn (0.24.0+):  `conda install scikit-learn=0.24.0`
+* tqdm (4.56.0+):     `conda install tqdm=4.56.0`
 
 Other dependencies such as `gdal`, `shapely`, `pandas`, and `numpy` will be installed during the `geopandas` and `sklearn` installs.
 
