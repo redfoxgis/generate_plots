@@ -68,3 +68,5 @@ The following flags are available:
 `-u` The units used for the range values: acres or hectares. `default = acres`.
 
 `-b` A buffer distance in map units used to ensure plot points are not within a certain distance from the polygon edge. `default = 0`
+
+`-s` A random seed for reproducible results. If not set, results will vary between runs. `default = None`
