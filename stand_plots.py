@@ -32,6 +32,7 @@ def parse_args():
     parser.add_argument("-p", "--plot_list", nargs='+', type=int, help = "plot_list")
     parser.add_argument("-u", "--units", type=str, default = "acres", help = "Units: acres or hectares")
     parser.add_argument("-b", "--buffer", type=float, default = 0, help = "Negative buffer distance in map units")
+    parser.add_argument("-s", "--seed", type=int, default = None, help = "Random seed for reproducible results")
     args = parser.parse_args()
     return args
 
@@ -54,7 +55,7 @@ def check_data(sr):
     None.
 
     """
-    if sr.is_projected == False:
+    if not sr.is_projected:
         raise ValueError("This tool only allows data in a projected coordinate system")
     if sr.axis_info[0].unit_name != 'metre':
         raise ValueError("This tool only allows data in a projected coordinate system with units as meters")
@@ -131,12 +132,18 @@ def random_points_in_polygon(number, polygon):
 
     points = []
     min_x, min_y, max_x, max_y = polygon.bounds
-    i= 0
+    i = 0
+    max_attempts = number * 1000
+    attempts = 0
     while i < number:
+        if attempts >= max_attempts:
+            raise ValueError(f"Could not place {number} points after {max_attempts} attempts. "
+                             "The polygon may be too small or the buffer too large.")
         point = Point(random.uniform(min_x, max_x), random.uniform(min_y, max_y))
         if polygon.contains(point):
             points.append(point)
             i += 1
+        attempts += 1
     return points  # returns list of shapely point
 
 def random_points(row, buffer_dist):
@@ -163,9 +170,8 @@ def random_points(row, buffer_dist):
         
         # Generate 1000 random points in each polygon
         points = random_points_in_polygon(1000, neg_buffer)
-        points_gdf = gpd.GeoDataFrame(points)
-        points_gdf.rename(columns = {0:'geometry'}, inplace = True)
-        # points_gdf.set_crs(epsg=26915)
+        points_gdf = gpd.GeoDataFrame(points, columns=['geometry'])
+        points_gdf = points_gdf.set_geometry('geometry')
         return points_gdf
     except ValueError as e:
         raise Exception('Please choose a smaller buffer value') from e
@@ -199,27 +205,22 @@ def cluster_points(points_gdf, size):
     gdf_cluster=points_gdf.join(k) #Add the cluster id to points_gdf 
     return gdf_cluster
 
-def cluster_centroids(gdf_cluster, empty_list):
+def cluster_centroids(gdf_cluster):
     """
     Parameters
     ----------
     gdf_cluster : geodataframe
         A geodataframe of point clusters
-    empty_list : list
-        An empty list to append centroids to
 
     Returns
     -------
-    None.
+    GeoSeries
+        Representative points (centroids) for each cluster.
 
     """
-    
-    # Calculate centroids
+
     dissolved_clusters = gdf_cluster.dissolve(by='cluster')
-    centroids = dissolved_clusters.representative_point() #Make sure centroid is within polygon
-    
-    # Append centroids to centroids_gdf
-    empty_list.append(centroids)
+    return dissolved_clusters.representative_point()
     
 def post_process(centroids_l, STANDS, sr, OUTFILE):
     """
@@ -244,12 +245,11 @@ def post_process(centroids_l, STANDS, sr, OUTFILE):
     points_flattened = [item for sublist in centroids_l for item in sublist]
     
     # Convert list of centroids to geodataframe and rename geometry column
-    centroids_gdf = gpd.GeoDataFrame(points_flattened)
-    centroids_gdf.rename(columns = {0:'geometry'}, inplace = True) # Create (rename) a geometry column
-    centroids_gdf.crs = sr # Set crs to utm 15N
+    centroids_gdf = gpd.GeoDataFrame(points_flattened, columns=['geometry'])
+    centroids_gdf = centroids_gdf.set_geometry('geometry', crs=sr)
     
     # Assign polygon ID to centroids
-    result = gpd.sjoin(centroids_gdf, STANDS, how = 'inner', op = 'intersects')
+    result = gpd.sjoin(centroids_gdf, STANDS, how='inner', predicate='intersects')
     result.crs = sr
     
     # Write to file
@@ -260,7 +260,9 @@ def post_process(centroids_l, STANDS, sr, OUTFILE):
     else:
         raise ValueError("This tool only allows Geopackage (.gpkg) and Shapefile (.shp) output")
         
-def main(STANDS, OUTFILE, break_values, plot_values, units, buffer):
+def main(STANDS, OUTFILE, break_values, plot_values, units, buffer, seed=None):
+    if seed is not None:
+        random.seed(seed)
     # Read in shapefile as geopandas df
     STANDS = gpd.read_file(STANDS)
     sr = STANDS.crs
@@ -283,11 +285,11 @@ def main(STANDS, OUTFILE, break_values, plot_values, units, buffer):
         clusters = cluster_points(random_points_gdf, size)
       
         # Calculate point cluster centroids
-        cluster_centroids(clusters, centroids_l)
+        centroids_l.append(cluster_centroids(clusters))
         
     # Convert list of cluster centroids to GDF then to geopackage
     post_process(centroids_l, STANDS, sr, OUTFILE)
 
 if __name__ == "__main__":      
     args = parse_args()
-    main(args.input, args.output, args.range_list, args.plot_list, args.units, args.buffer)
+    main(args.input, args.output, args.range_list, args.plot_list, args.units, args.buffer, args.seed)
